@@ -7,60 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C48B479C6CCD1E264E32A409 /* Pods_AutoRaise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5806E42520E49707EF8523A9 /* Pods_AutoRaise.framework */; };
-		C501B69525875F32005B3964 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = C501B69425875F32005B3964 /* LICENSE.md */; };
+	C501B69525875F32005B3964 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = C501B69425875F32005B3964 /* LICENSE.md */; };
+	F10000000000000000000002 /* MASShortcut.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F10000000000000000000001 /* MASShortcut.framework */; };
+	F10000000000000000000003 /* MASShortcut.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F10000000000000000000001 /* MASShortcut.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C557DD431B988ED300E59BC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C557DD421B988ED300E59BC9 /* AppDelegate.swift */; };
+		D89BD0F9BE0F36E0ADD2E879 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA794CCE0FDE84DDA7F5304A /* PreferencesView.swift */; };
+		B8B903A839B8B055AB7C4FCB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE552FE3BC02B8196BA64C6E /* main.swift */; };
 		C557DD451B988ED300E59BC9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C557DD441B988ED300E59BC9 /* Images.xcassets */; };
-		C557DD481B988ED300E59BC9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = C557DD461B988ED300E59BC9 /* MainMenu.xib */; };
 		C58DC14525FCEBBB00084C22 /* AutoRaise in Resources */ = {isa = PBXBuildFile; fileRef = C58DC14425FCEBBB00084C22 /* AutoRaise */; };
 		C58DC14D25FCF1C100084C22 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C58DC14C25FCF1C100084C22 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3676C4DAF7DC0223742E288E /* Pods-AutoRaise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AutoRaise.debug.xcconfig"; path = "Target Support Files/Pods-AutoRaise/Pods-AutoRaise.debug.xcconfig"; sourceTree = "<group>"; };
-		5806E42520E49707EF8523A9 /* Pods_AutoRaise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AutoRaise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+	F10000000000000000000001 /* MASShortcut.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MASShortcut.framework; path = MASShortcut.framework; sourceTree = "<group>"; };
 		85EB3A8F2898550200BC5D8C /* AutoRaise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AutoRaise.entitlements; sourceTree = "<group>"; };
-		85F5281428968D4F00C99435 /* AutoRaise-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AutoRaise-Bridging-Header.h"; sourceTree = "<group>"; };
-		953A47BDA38A2BC722250B9D /* Pods-AutoRaise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AutoRaise.release.xcconfig"; path = "Target Support Files/Pods-AutoRaise/Pods-AutoRaise.release.xcconfig"; sourceTree = "<group>"; };
-		C501B69425875F32005B3964 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
+	85F5281428968D4F00C99435 /* AutoRaise-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AutoRaise-Bridging-Header.h"; sourceTree = "<group>"; };
+	C501B69425875F32005B3964 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		C557DD3D1B988ED300E59BC9 /* AutoRaise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoRaise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C557DD421B988ED300E59BC9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DA794CCE0FDE84DDA7F5304A /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		AE552FE3BC02B8196BA64C6E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C557DD441B988ED300E59BC9 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		C557DD471B988ED300E59BC9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		C570C3762586877A00CC080F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C58DC14425FCEBBB00084C22 /* AutoRaise */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AutoRaise; sourceTree = "<group>"; };
+		AA1234567890ABCDEF123456 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		C58DC14C25FCF1C100084C22 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C557DD3A1B988ED300E59BC9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C48B479C6CCD1E264E32A409 /* Pods_AutoRaise.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+	C557DD3A1B988ED300E59BC9 /* Frameworks */ = {
+		isa = PBXFrameworksBuildPhase;
+		buildActionMask = 2147483647;
+		files = (
+			F10000000000000000000002 /* MASShortcut.framework in Frameworks */,
+		);
+		runOnlyForDeploymentPostprocessing = 0;
+	};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		696712223BD4FFAEDC9705D0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3676C4DAF7DC0223742E288E /* Pods-AutoRaise.debug.xcconfig */,
-				953A47BDA38A2BC722250B9D /* Pods-AutoRaise.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
-		8F1D171571F9FEC6219E58F6 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				5806E42520E49707EF8523A9 /* Pods_AutoRaise.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
+	8F1D171571F9FEC6219E58F6 /* Frameworks */ = {
+		isa = PBXGroup;
+		children = (
+			F10000000000000000000001 /* MASShortcut.framework */,
+		);
+		name = Frameworks;
+		sourceTree = "<group>";
+	};
 		C557DD341B988ED300E59BC9 = {
 			isa = PBXGroup;
 			children = (
@@ -69,10 +61,10 @@
 				C58DC14C25FCF1C100084C22 /* README.md */,
 				C58DC14425FCEBBB00084C22 /* AutoRaise */,
 				C501B69425875F32005B3964 /* LICENSE.md */,
+				AA1234567890ABCDEF123456 /* Signing.xcconfig */,
 				C557DD3F1B988ED300E59BC9 /* Launcher */,
-				C557DD3E1B988ED300E59BC9 /* Products */,
-				696712223BD4FFAEDC9705D0 /* Pods */,
-				8F1D171571F9FEC6219E58F6 /* Frameworks */,
+			C557DD3E1B988ED300E59BC9 /* Products */,
+			8F1D171571F9FEC6219E58F6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,8 +80,9 @@
 			isa = PBXGroup;
 			children = (
 				C557DD421B988ED300E59BC9 /* AppDelegate.swift */,
+				DA794CCE0FDE84DDA7F5304A /* PreferencesView.swift */,
+				AE552FE3BC02B8196BA64C6E /* main.swift */,
 				C557DD441B988ED300E59BC9 /* Images.xcassets */,
-				C557DD461B988ED300E59BC9 /* MainMenu.xib */,
 				C557DD401B988ED300E59BC9 /* Supporting Files */,
 			);
 			path = Launcher;
@@ -98,7 +91,6 @@
 		C557DD401B988ED300E59BC9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				C570C3762586877A00CC080F /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -109,14 +101,13 @@
 		C557DD3C1B988ED300E59BC9 /* AutoRaise */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C557DD571B988ED300E59BC9 /* Build configuration list for PBXNativeTarget "AutoRaise" */;
-			buildPhases = (
-				328A8E4EC85FBFD98D10494A /* [CP] Check Pods Manifest.lock */,
-				C5543C5325CFF41A0093A39E /* ShellScript */,
-				C557DD391B988ED300E59BC9 /* Sources */,
-				C557DD3A1B988ED300E59BC9 /* Frameworks */,
-				C557DD3B1B988ED300E59BC9 /* Resources */,
-				9EF240EA4411AC4639E72CBA /* [CP] Embed Pods Frameworks */,
-			);
+		buildPhases = (
+			C5543C5325CFF41A0093A39E /* ShellScript */,
+			C557DD391B988ED300E59BC9 /* Sources */,
+			C557DD3A1B988ED300E59BC9 /* Frameworks */,
+			C557DD3B1B988ED300E59BC9 /* Resources */,
+			F10000000000000000000004 /* Copy Frameworks */,
+		);
 			buildRules = (
 			);
 			dependencies = (
@@ -171,53 +162,27 @@
 				C557DD451B988ED300E59BC9 /* Images.xcassets in Resources */,
 				C58DC14D25FCF1C100084C22 /* README.md in Resources */,
 				C58DC14525FCEBBB00084C22 /* AutoRaise in Resources */,
-				C557DD481B988ED300E59BC9 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+	F10000000000000000000004 /* Copy Frameworks */ = {
+		isa = PBXCopyFilesBuildPhase;
+		buildActionMask = 2147483647;
+		dstPath = "";
+		dstSubfolderSpec = 10;
+		files = (
+			F10000000000000000000003 /* MASShortcut.framework in Frameworks */,
+		);
+		name = "Copy Frameworks";
+		runOnlyForDeploymentPostprocessing = 0;
+	};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXShellScriptBuildPhase section */
-		328A8E4EC85FBFD98D10494A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-AutoRaise-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9EF240EA4411AC4639E72CBA /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AutoRaise/Pods-AutoRaise-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/MASShortcut/MASShortcut.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MASShortcut.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AutoRaise/Pods-AutoRaise-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
+
 		C5543C5325CFF41A0093A39E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -244,20 +209,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				C557DD431B988ED300E59BC9 /* AppDelegate.swift in Sources */,
+				D89BD0F9BE0F36E0ADD2E879 /* PreferencesView.swift in Sources */,
+				B8B903A839B8B055AB7C4FCB /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		C557DD461B988ED300E59BC9 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C557DD471B988ED300E59BC9 /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
+
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -290,11 +250,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -312,7 +270,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -351,11 +309,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -366,7 +322,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
@@ -377,30 +333,30 @@
 			};
 			name = Release;
 		};
-		C557DD581B988ED300E59BC9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3676C4DAF7DC0223742E288E /* Pods-AutoRaise.debug.xcconfig */;
-			buildSettings = {
+	C557DD581B988ED300E59BC9 /* Debug */ = {
+		isa = XCBuildConfiguration;
+		baseConfigurationReference = AA1234567890ABCDEF123456 /* Signing.xcconfig */;
+		buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AutoRaise.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=*]" = "-";
-				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Launcher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.7.0;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sbmpost.AutoRaise;
+			MACOSX_DEPLOYMENT_TARGET = 14.0;
+			MARKETING_VERSION = 6.1;
+			FRAMEWORK_SEARCH_PATHS = (
+				"$(inherited)",
+				"$(SRCROOT)",
+			);
+			ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.autoraise.app;
 				PRODUCT_NAME = AutoRaise;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -410,30 +366,30 @@
 			};
 			name = Debug;
 		};
-		C557DD591B988ED300E59BC9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 953A47BDA38A2BC722250B9D /* Pods-AutoRaise.release.xcconfig */;
-			buildSettings = {
+	C557DD591B988ED300E59BC9 /* Release */ = {
+		isa = XCBuildConfiguration;
+		baseConfigurationReference = AA1234567890ABCDEF123456 /* Signing.xcconfig */;
+		buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AutoRaise.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Launcher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 5.7.0;
-				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sbmpost.AutoRaise;
+			MACOSX_DEPLOYMENT_TARGET = 14.0;
+			MARKETING_VERSION = 6.1;
+			FRAMEWORK_SEARCH_PATHS = (
+				"$(inherited)",
+				"$(SRCROOT)",
+			);
+			ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.autoraise.app;
 				PRODUCT_NAME = AutoRaise;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

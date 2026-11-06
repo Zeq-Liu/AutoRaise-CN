@@ -4,3 +4,19 @@ AutoRaise.xcodeproj/project.xcworkspace/xcuserdata/
 .DS_Store
 AutoRaise.xcodeproj/xcuserdata/
 Pods/
+
+# 架构分离编译残留（lipo -thin 产物，非源码）
+arm_app
+x86_app
+
+# 本机私有签名配置（含开发者 Team ID，禁止入库/推送）
+Signing.local.xcconfig
+*.local.xcconfig
+
+# 本地备份产物（可能含已签名二进制，禁止入库）
+_backup_*
+*.tar.gz
+
+# 构建产物：DMG / 校验文件（发布时作为 release 附件上传，不进仓库）
+*.dmg
+*.dmg.sha256

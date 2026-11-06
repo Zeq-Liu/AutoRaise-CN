@@ -1,3 +1,13 @@
+# AutoRaise & Launcher（简体中文修改版 / SwiftUI 重构）
+
+> **本仓库是基于 [sbmpost/AutoRaise-UI](https://github.com/sbmpost/AutoRaise-UI) 的修改版本（derivative work，GPL-3.0）。**
+> - 上游作者：Stefan Post（daemon: https://github.com/sbmpost/AutoRaise）、Lothar Haeger（https://github.com/lhaeger/AutoRaise）
+> - 本修改版变更：简体中文界面、macOS 14+ SwiftUI 偏好窗口重构、离线重建 MASShortcut 依赖
+> - 修改日期：2026-11-01　修改者：coderLiu（开源贡献者，昵称）
+> - 许可证：继承上游 **GPL-3.0**，原作者版权与署名完整保留于 `LICENSE.md`，未作任何删改或放宽
+>
+> 下游复用请遵守 GPL-3.0：保留本声明及 `LICENSE.md`。
+
 # AutoRaise & Launcher    ![](Launcher/Images.xcassets/AppIcon.appiconset/AutoRaise_32.png)                  
 
 
