@@ -28,7 +28,7 @@
 #include <Carbon/Carbon.h>
 #include <libproc.h>
 
-#define AUTORAISE_VERSION "5.7"
+#define AUTORAISE_VERSION "6.1"
 #define STACK_THRESHOLD 20
 
 #ifdef EXPERIMENTAL_FOCUS_FIRST
@@ -90,10 +90,25 @@ extern "C" AXError _AXUIElementGetWindow(AXUIElementRef, CGWindowID *out);
 static int raiseDelayCount = 0;
 static pid_t lastFocusedWindow_pid;
 static AXUIElementRef _lastFocusedWindow = NULL;
+// 延迟回调（onWindowFocused:）用窗口 id 而不是指针做身份比对。
+// 原实现把 _lastFocusedWindow 的指针值塞进 NSNumber 延迟 raiseDelay*poll 毫秒，
+// 延迟期间 onTick 完全可能 CFRelease 掉旧元素并把 _lastFocusedWindow 指向新窗口：
+// 旧指针值若被 AX 框架复用，回调会对已释放的引用 raiseAndActivate（UAF）；
+// 指针不等时静默丢 raise。id 在窗口存续期内是稳定的，用它比对没有这些问题。
+static CGWindowID lastFocusedWindow_id = kCGNullWindowID;
+static pid_t lastFocusedWindow_pid_for_raise = 0;
 #endif
 
 static AXObserverRef axObserver = NULL;
 static uint64_t lastDestroyedMouseWindow_id = kCGNullWindowID;
+// 销毁标记的过期时刻（CFAbsoluteTime 秒）。
+// CGWindowID 会被 WindowServer 复用：某个窗口销毁后，系统把同一个 id 分给新窗口，
+// 此时 mouseWindow_id == lastDestroyedMouseWindow_id 成立，mouseWindowPresent 被判 false，
+// 新窗口永远进不了提升分支。原实现只在「鼠标换到别的 id」时才清标记，
+// 而一旦卡在复用场景，鼠标下面一直是同一个 id，标记永远清不掉 —— 永久卡死且无自愈。
+// 加时效：标记只在短窗口内有效，过了就作废。
+static CFTimeInterval lastDestroyedExpiry = 0;
+static const CFTimeInterval destroyedMarkTTL = 1.0;
 
 static CFMachPortRef eventTap = NULL;
 static char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
@@ -112,6 +127,26 @@ static NSArray * const mainWindowAppsWithoutTitle =@[
     @"Podcasts",
     @"Stickies Pro",
     @"Reeder"
+];
+// 上面那份白名单按「应用显示名」匹配，而显示名是本地化的：
+// 中文系统上 System Settings 叫「系统设置」、Photos 叫「照片」，
+// 于是 7 项里有 6 项在中国区系统上必然失配（只有 Reeder/Stickies Pro
+// 这类第三方应用名不随语言变）。这里补一份 bundle id 白名单，
+// bundle id 不随语言和地区变化，两份取并集即可，不会漏判。
+static NSArray * const mainWindowBundleIds =@[
+    @"com.apple.systempreferences",   // 系统设置（macOS 13+ 仍沿用此 id）
+    @"com.apple.SystemProfiler",      // 系统信息
+    @"com.apple.Photos",              // 照片
+    @"com.apple.calculator",          // 计算器
+    @"com.apple.podcasts",            // 播客
+    @"com.apple.Stickies",            // 便笺（原白名单写的 Third-party "Stickies Pro"）
+];
+// 需要「前缀」匹配的 bundle id：Reeder 的版本后缀不固定
+//（com.reederapp / com.reederapp.mac 等），只能按前缀认。
+// 其余项一律精确匹配 —— 用 hasPrefix 会把 com.apple.PhotosAgent、
+// com.apple.calculator.widget 这类同厂子进程/小组件一并放行，范围过宽。
+static NSArray * const mainWindowBundlePrefixes =@[
+    @"com.reederapp",
 ];
 static NSArray * pwas = @[
     @"Chrome",
@@ -241,9 +276,15 @@ inline void activate(pid_t pid) {
 
 inline void raiseAndActivate(AXUIElementRef _window, pid_t window_pid) {
     if (verbose) { NSLog(@"Raise"); }
-    if (AXUIElementPerformAction(_window, kAXRaiseAction) == kAXErrorSuccess) {
-        activate(window_pid);
+    // kAXRaiseAction 是「应用内」动作：它只能把窗口提到同一应用的其他窗口之上。
+    // 跨应用上位靠的是 activate()。所以 raise 失败只说明该 app 内部重排没成功，
+    // 不代表不该激活这个 app —— 原实现把 activate 锁在 raise 成功分支里，
+    // 一旦 raise 失败（过渡态里很常见）就连激活都不做，整个 tick 白跑且无补偿。
+    AXError error = AXUIElementPerformAction(_window, kAXRaiseAction);
+    if (error != kAXErrorSuccess && verbose) {
+        NSLog(@"Raise failed with AXError %d, activating anyway", error);
     }
+    activate(window_pid);
 }
 
 inline void logWindowTitle(NSString * prefix, AXUIElementRef _window) {
@@ -371,6 +412,12 @@ AXUIElementRef fallback(CGPoint point) {
                         }
                     }
                 }
+            }
+            // 空数组也要激活：app 刚关完所有窗口时 kAXWindowsAttribute 会返回
+            // 空数组而不是 NULL，原实现只处理 NULL 的情况，空数组会遍历零次
+            // 然后静默返回 NULL —— 既不返回窗口也不激活，与主 bug 同类的过渡态盲区。
+            if (!_window && application_windows.count == 0) {
+                activate(pid);
             }
         } else {
             activate(pid);
@@ -664,25 +711,73 @@ inline bool is_full_screen(AXUIElementRef _window) {
 inline bool is_main_window(AXUIElementRef _app, AXUIElementRef _window, bool chrome_app) {
     bool main_window = false;
     CFBooleanRef _result = NULL;
-    AXUIElementCopyAttributeValue(_window, kAXMainAttribute, (CFTypeRef *) &_result);
-    if (_result) {
-        main_window = CFEqual(_result, kCFBooleanTrue);
-        if (main_window) {
-            CFStringRef _element_sub_role = NULL;
-            AXUIElementCopyAttributeValue(_window, kAXSubroleAttribute, (CFTypeRef *) &_element_sub_role);
-            if (_element_sub_role) {
-                main_window = !CFEqual(_element_sub_role, kAXDialogSubrole);
-                if (verbose && !main_window) { NSLog(@"Dialog window"); }
-                CFRelease(_element_sub_role);
+
+    // 用 bundleIdentifier 判断是不是访达。
+    // 原实现用 titleEquals(_app, @[Finder])，读的是应用名（本地化）：
+    // 中文系统上访达叫「访达」而不是「Finder」，匹配必然失败，
+    // 于是下面所有访达豁免逻辑（无标题放行、全屏判断）在中文系统上全部失效。
+    // bundle id 是 com.apple.finder，不随语言变化。
+    pid_t app_pid_for_finder = 0;
+    bool finder_app = false;
+    NSString * app_bundle_id = nil;
+    if (AXUIElementGetPid(_app, &app_pid_for_finder) == kAXErrorSuccess) {
+        app_bundle_id = [NSRunningApplication
+            runningApplicationWithProcessIdentifier: app_pid_for_finder].bundleIdentifier;
+        finder_app = [app_bundle_id isEqual: FinderBundleId];
+    }
+    if (!finder_app) { finder_app = titleEquals(_app, @[Finder]); }
+
+    // 白名单同样改成 bundle id 优先：中文系统上应用显示名全部本地化，
+    // 按名字匹配等于没写（详见 mainWindowBundleIds 处注释）。
+    // 两份取并集：bundle id 命中即算；没命中再退回原来的名字匹配，
+    // 这样第三方应用（名字不本地化）和老行为都不受影响。
+    bool whitelisted_app = false;
+    if (app_bundle_id) {
+        // 精确匹配优先：避免同厂子进程（PhotosAgent 等）被 hasPrefix 误放行。
+        whitelisted_app = [mainWindowBundleIds containsObject: app_bundle_id];
+        if (!whitelisted_app) {
+            for (NSString * prefix in mainWindowBundlePrefixes) {
+                if ([app_bundle_id hasPrefix: prefix]) { whitelisted_app = true; break; }
             }
         }
+    }
+    if (!whitelisted_app) { whitelisted_app = titleEquals(_app, mainWindowAppsWithoutTitle); }
+
+    // kAXMainAttribute 的语义陷阱：它只对「当前前台应用」的窗口为 true。
+    // 应用在后台时其主窗口 AXMain=false —— 但那不代表它不是正经主窗口。
+    // 原实现据此判定，导致后台的无标题主窗口（系统设置/计算器/照片等
+    // mainWindowAppsWithoutTitle 白名单应用）永远无法被提升，白名单形同虚设。
+    // 这里改为：AXMain 仅作为「有值」时的参考，不再能否决；
+    // 真正的浮层/对话框由 subrole 判断。
+    bool ax_main_true = false;
+    AXUIElementCopyAttributeValue(_window, kAXMainAttribute, (CFTypeRef *) &_result);
+    if (_result) {
+        ax_main_true = CFEqual(_result, kCFBooleanTrue);
         CFRelease(_result);
     }
 
-    bool finder_app = titleEquals(_app, @[Finder]);
-    main_window = main_window && (chrome_app || finder_app ||
+    CFStringRef _element_sub_role = NULL;
+    AXUIElementCopyAttributeValue(_window, kAXSubroleAttribute, (CFTypeRef *) &_element_sub_role);
+    bool is_dialog = false;
+    if (_element_sub_role) {
+        is_dialog = CFEqual(_element_sub_role, kAXDialogSubrole);
+        CFRelease(_element_sub_role);
+    }
+
+    // 对话框只在「它就是前台主窗口」时才排除；后台窗口是对话框也无所谓，
+    // 因为后台 app 的窗口本来就该允许被提升。
+    if (ax_main_true && is_dialog) {
+        if (verbose) { NSLog(@"Dialog window"); }
+        return false;
+    }
+
+    // 有标题的窗口直接放行；无标题的需要进一步确认。
+    main_window = chrome_app || finder_app ||
         !titleEquals(_window, @[NoTitle]) ||
-        titleEquals(_app, mainWindowAppsWithoutTitle));
+        whitelisted_app;
+
+    // 无标题且不在白名单里：此时才参考 AXMain，但不因此否决后台窗口。
+    if (!main_window && ax_main_true) { main_window = true; }
 
     main_window = main_window || (!finder_app && is_full_screen(_window));
 
@@ -778,13 +873,16 @@ static MDWorkspaceWatcher * workspaceWatcher = NULL;
 - (void)windowFocused:(AXUIElementRef)_window {
     if (verbose) { NSLog(@"Window focused, waiting %0.3fs", raiseDelayCount*pollMillis/1000.0); }
     [self performSelector: @selector(onWindowFocused:)
-        withObject: [NSNumber numberWithUnsignedLong: (uint64_t) _window]
+        withObject: [NSNumber numberWithUnsignedLong: (uint64_t) lastFocusedWindow_id]
         afterDelay: raiseDelayCount*pollMillis/1000.0];
 }
 
 - (void)onWindowFocused:(NSNumber *)_window {
-    if (_window.unsignedLongValue == (uint64_t) _lastFocusedWindow) {
-        raiseAndActivate(_lastFocusedWindow, lastFocusedWindow_pid);
+    // 按 id 比对（见 lastFocusedWindow_id 处注释）。pid 快照同步携带，
+    // 避免依赖延迟期间可能已变化的全局 lastFocusedWindow_pid。
+    if (_window.unsignedLongValue == (uint64_t) lastFocusedWindow_id &&
+        lastFocusedWindow_id != kCGNullWindowID) {
+        raiseAndActivate(_lastFocusedWindow, lastFocusedWindow_pid_for_raise);
     } else if (verbose) { NSLog(@"Ignoring window focused event"); }
 }
 #endif
@@ -1022,6 +1120,8 @@ bool appActivated() {
 void AXCallback(AXObserverRef observer, AXUIElementRef _element, CFStringRef notification, void * destroyedMouseWindow_id) {
     if (CFEqual(notification, kAXUIElementDestroyedNotification)) {
         lastDestroyedMouseWindow_id = (uint64_t) destroyedMouseWindow_id;
+        // 与标记同时记录过期时刻，避免 CGWindowID 复用造成永久压制。
+        lastDestroyedExpiry = CFAbsoluteTimeGetCurrent() + destroyedMarkTTL;
     }
 }
 
@@ -1163,9 +1263,21 @@ void onTick() {
         if (_mouseWindow) {
             pid_t mouseWindow_pid;
             if (AXUIElementGetPid(_mouseWindow, &mouseWindow_pid) == kAXErrorSuccess) {
-                CGWindowID mouseWindow_id;
-                _AXUIElementGetWindow(_mouseWindow, &mouseWindow_id);
-                bool mouseWindowPresent = mouseWindow_id != lastDestroyedMouseWindow_id;
+                CGWindowID mouseWindow_id = kCGNullWindowID;
+                // _AXUIElementGetWindow 失败时会把 out 参数写成 0（实测），
+                // 而 kCGNullWindowID 本身就是 0。若不区分"失败"与"id 真是 0"，
+                // 下面 mouseWindowPresent 的 != 比较会把取 id 失败误判成
+                // "窗口刚被销毁"，needs_raise 归零后永久不再提升。
+                bool mouseWindowIdValid =
+                    _AXUIElementGetWindow(_mouseWindow, &mouseWindow_id) == kAXErrorSuccess;
+                // 销毁标记过期后作废，避免 CGWindowID 复用导致永久压制（见 destroyedMarkTTL 处注释）。
+                if (lastDestroyedMouseWindow_id != kCGNullWindowID &&
+                    CFAbsoluteTimeGetCurrent() > lastDestroyedExpiry) {
+                    lastDestroyedMouseWindow_id = kCGNullWindowID;
+                    if (verbose) { NSLog(@"Destroyed window mark expired"); }
+                }
+                bool mouseWindowPresent = !mouseWindowIdValid ||
+                    mouseWindow_id != lastDestroyedMouseWindow_id;
                 if (mouseWindowPresent) {
                     static CGWindowID previous_id = kCGNullWindowID;
                     if (mouseWindow_id != previous_id) {
@@ -1230,12 +1342,23 @@ void onTick() {
                     workaround_for_apps_raising_on_focus = titleEquals(_mouseWindowApp, AppsRaisingOnFocus);
 #endif
                 }
+                // app 级黑名单必须独立于上面的 else-if 链再查一次。
+                // 原实现把 ignoreApps 放在链尾的 `else if (mouseWindowPresent)` 分支里，
+                // 而无标题窗口在第一支就被接走（is_main_window 判定），
+                // 于是「用户拉黑了某 app，但它的窗口没有标题」时黑名单被整条绕过，
+                // 照样被提升。这里补一次，对已判过的分支是幂等的。
+                if (needs_raise && mouseWindowPresent && titleEquals(_mouseWindowApp, ignoreApps)) {
+                    needs_raise = invertIgnoreApps;
+                    if (verbose) {
+                        NSLog(invertIgnoreApps ? @"Including app" : @"Excluding app (no-title path)");
+                    }
+                }
                 CFRelease(_mouseWindowApp);
                 if (needs_raise && is_offscreen_window(_mouseWindow, mousePoint)) {
                     needs_raise = false;
                     if (verbose) { NSLog(@"Excluding offscreen window"); }
                 }
-                CGWindowID focusedWindow_id;
+                CGWindowID focusedWindow_id = kCGNullWindowID;
 #ifdef FOCUS_FIRST
                 ProcessSerialNumber mouseWindow_psn;
                 ProcessSerialNumber focusedWindow_psn;
@@ -1279,12 +1402,26 @@ void onTick() {
                         CFRelease(_focusedWindow);
                     } else {
                         if (verbose) { NSLog(@"No focused window"); }
+                        // 原版：前台应用只要「有」AXMainWindow 就放弃提升。
+                        // 但那只回答了"前台 app 有没有主窗口"，没回答
+                        // "鼠标下这个窗口是不是已经是焦点"。关掉前台 app 的窗口后，
+                        // 它的 AXMainWindow 仍可能读得到（或在别的 Space），
+                        // 于是这里无条件 needs_raise=false，鼠标下真正该提升的窗口
+                        // 永远等不到提升 —— 这就是「关窗后下层窗口永不激活」的主链路。
+                        //
+                        // 改成一致性判断：只有 AXMainWindow 就是鼠标下这个窗口时，
+                        // 才算「系统状态已经对」，此时才放弃。
                         AXUIElementRef _activatedWindow = NULL;
                         AXUIElementCopyAttributeValue(_frontmostApp,
                             kAXMainWindowAttribute, (CFTypeRef *) &_activatedWindow);
                         if (_activatedWindow) {
-                          needs_raise = false;
-                          CFRelease(_activatedWindow);
+                            CGWindowID activatedWindow_id = kCGNullWindowID;
+                            _AXUIElementGetWindow(_activatedWindow, &activatedWindow_id);
+                            needs_raise = mouseWindow_id != activatedWindow_id;
+                            if (verbose && !needs_raise) {
+                                NSLog(@"Activated window is the mouse window, nothing to do");
+                            }
+                            CFRelease(_activatedWindow);
                         }
                     }
                     CFRelease(_frontmostApp);
@@ -1327,6 +1464,9 @@ void onTick() {
                                 if (_lastFocusedWindow) { CFRelease(_lastFocusedWindow); }
                                 _lastFocusedWindow = _mouseWindow;
                                 lastFocusedWindow_pid = mouseWindow_pid;
+                                // 同步快照 id 与 pid，供延迟回调做身份比对与执行。
+                                lastFocusedWindow_id = mouseWindowIdValid ? mouseWindow_id : kCGNullWindowID;
+                                lastFocusedWindow_pid_for_raise = mouseWindow_pid;
                                 if (raiseDelayCount && needs_raise_and_not_contained_within) {
                                     [workspaceWatcher windowFocused: _lastFocusedWindow];
                                 }
