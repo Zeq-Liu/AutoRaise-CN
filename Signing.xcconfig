@@ -1,0 +1,21 @@
+// 签名配置（不含任何个人信息的默认值）
+//
+// 本文件随仓库分发，保证 clone 后能直接编译。
+//
+// 如果你有自己的 Apple Developer 账号，想用正式证书签名：
+//   1. 在此文件同目录新建 Signing.local.xcconfig（已被 .gitignore 排除，不会误提交）
+//   2. 内容写：
+//        DEVELOPMENT_TEAM = <你的 Team ID>
+//        CODE_SIGN_STYLE = Manual
+//        CODE_SIGN_IDENTITY = Apple Development
+//   3. 在 Xcode 的 target > Build Settings > 把 base configuration 指到该文件，
+//      或用命令行覆盖：
+//        xcodebuild ... DEVELOPMENT_TEAM=<你的TeamID> CODE_SIGN_IDENTITY="Apple Development"
+//
+// 不做任何配置时，Xcode 会使用 "Sign to Run Locally"（adhoc 签名），
+// 足以在本机运行和调试。开源分发请按 文档/发布/打包流程.md 手动 ad-hoc 重签。
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = -
+CODE_SIGNING_REQUIRED = NO
+CODE_SIGNING_ALLOWED = YES
